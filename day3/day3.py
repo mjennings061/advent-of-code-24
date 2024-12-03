@@ -2,6 +2,7 @@
 https://adventofcode.com/2024/day/3"""
 
 import re
+from pathlib import Path
 
 
 def multiply_string(string: str) -> int:
@@ -39,9 +40,15 @@ def multiply_string(string: str) -> int:
 
 
 if __name__ == "__main__":
-    DEFAULT_STING = (
-        "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)"
-        "+mul(32,64]then(mul(11,8)mul(8,5))"
-    )
-    result = multiply_string(DEFAULT_STING)
+    # Get path to input file.
+    FILE_NAME = "input.txt"
+    this_dir = Path(__file__).parent
+    file_path = Path(this_dir, FILE_NAME)
+
+    # Read contents.
+    with open(file_path, 'r') as file:
+        file_contents = file.read()
+
+    # Sum multiples.
+    result = multiply_string(file_contents)
     print(result)
