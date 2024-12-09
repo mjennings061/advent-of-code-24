@@ -18,7 +18,7 @@ def out_of_order(sorted_list, rules) -> bool:
     return False
 
 
-def printer_sort(input_txt: List[str]) -> int:
+def printer_sort(input_txt: List[str], reorder: bool = False) -> int:
     """Sort by rules and get sum of middle pages."""
     # Use regex to get all rules.
     rule_exp = r"\d+\|\d+"
@@ -59,6 +59,15 @@ def printer_sort(input_txt: List[str]) -> int:
                     rules_to_apply.append(rule)
                     break
 
+        is_out_of_order = out_of_order(set, rules_to_apply)
+        if reorder is False and is_out_of_order:
+            # Do not process this set of page numbers.
+            continue
+
+        if reorder and not is_out_of_order:
+            # Order is correct but reorder requested, skip.
+            continue
+
         reordered_set = set
         while out_of_order(reordered_set, rules_to_apply):
             for rule in rules_to_apply:
@@ -72,7 +81,7 @@ def printer_sort(input_txt: List[str]) -> int:
 
         # Sanity check.
         if out_of_order(reordered_set, rules_to_apply):
-            print("ffs")
+            raise ValueError("FFS: Something funky happening here.")
         reordered_sets.append(reordered_set)
 
     # Calculate sum of middle pages.
@@ -94,6 +103,10 @@ if __name__ == "__main__":
     with open(filepath, 'r') as file:
         input_txt = file.read()
 
-    # Sort and sum middle page numbers.
+    # Part one: Sum correctly ordered middle page numbers.
     middle_page_sum = printer_sort(input_txt=input_txt)
-    print(middle_page_sum)
+    print(f"Sum of correct page sets: {middle_page_sum}")
+
+    # Part two: Sum reordered middle page numbers.
+    middle_page_sum = printer_sort(input_txt=input_txt, reorder=True)
+    print(f"Sum of reordered middle pages: {middle_page_sum}")
