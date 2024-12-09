@@ -3,6 +3,19 @@
 import re
 from pathlib import Path
 from typing import List
+from math import floor
+
+
+def out_of_order(sorted_list, rules) -> bool:
+    """Check if the list is out of order."""
+    # Sanity check.
+    for rule in rules:
+        # Get the indices where the rule appears.
+        left_index = sorted_list.index(rule[0])
+        right_index = sorted_list.index(rule[1])
+        if left_index > right_index:
+            return True
+    return False
 
 
 def printer_sort(input_txt: List[str]) -> int:
@@ -26,25 +39,49 @@ def printer_sort(input_txt: List[str]) -> int:
         pages = [int(page) for page in this_set]
         pages_set.append(pages)
 
-    # For each page.
+    # For each set of pages.
     # Determine if any rules exist for that page.
-    # If the other page exists in the set, determine page order.
-    # Move pages in set.
+    # Figure if its out of order based on the rules.
+    # Swap out of order indices.
 
     # Find relevant rules for the page set.
+    reordered_sets = []
     for set in pages_set:
         # Find rules pertaining to at least two elements of the pages set.
+        rules_to_apply = []
         for rule in rules:
             # Find if a rule applies.
             n_present = 0
-            both_present = False
             for page in set:
-                if rule == page:
+                if page in rule:
                     n_present += 1
                 if n_present == 2:
-                    both_present = True
+                    rules_to_apply.append(rule)
                     break
-                    
+
+        reordered_set = set
+        while out_of_order(reordered_set, rules_to_apply):
+            for rule in rules_to_apply:
+                # Get the indices where the rule appears.
+                left_index = reordered_set.index(rule[0])
+                right_index = reordered_set.index(rule[1])
+                if left_index > right_index:
+                    # Swap page positions.
+                    reordered_set[left_index] = rule[1]
+                    reordered_set[right_index] = rule[0]
+
+        # Sanity check.
+        if out_of_order(reordered_set, rules_to_apply):
+            print("ffs")
+        reordered_sets.append(reordered_set)
+
+    # Calculate sum of middle pages.
+    sum_of_pages = 0
+    for set in reordered_sets:
+        # Get the middle page.
+        i_middle = floor(len(set) / 2)
+        sum_of_pages += set[i_middle]
+    return sum_of_pages
 
 
 if __name__ == "__main__":
